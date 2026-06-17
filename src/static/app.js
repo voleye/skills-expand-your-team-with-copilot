@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
 
+  // School name used in share messages
+  const SCHOOL_NAME = "Mergington High School";
+
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
@@ -569,6 +572,17 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="share-section">
+        <button class="share-toggle-button" data-activity="${name}" aria-label="Share this activity">
+          🔗 Share
+        </button>
+        <div class="share-popup hidden" data-activity="${name}">
+          <a class="share-btn share-twitter" href="#" target="_blank" rel="noopener noreferrer" title="Share on X (Twitter)">𝕏</a>
+          <a class="share-btn share-facebook" href="#" target="_blank" rel="noopener noreferrer" title="Share on Facebook">f</a>
+          <a class="share-btn share-whatsapp" href="#" target="_blank" rel="noopener noreferrer" title="Share on WhatsApp">💬</a>
+          <button class="share-btn share-copy" data-activity="${name}" title="Copy link">📋</button>
+        </div>
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -586,6 +600,48 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Set up social sharing buttons
+    const shareToggle = activityCard.querySelector(".share-toggle-button");
+    const sharePopup = activityCard.querySelector(".share-popup");
+
+    shareToggle.addEventListener("click", () => {
+      // Close any other open share popups
+      document.querySelectorAll(".share-popup").forEach((popup) => {
+        if (popup !== sharePopup) {
+          popup.classList.add("hidden");
+        }
+      });
+      sharePopup.classList.toggle("hidden");
+    });
+
+    // Build the share URL and message for this activity
+    const activityUrl = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(name)}`;
+    const shareText = `Check out "${name}" at ${SCHOOL_NAME}! Schedule: ${formattedSchedule}`;
+
+    const twitterLink = activityCard.querySelector(".share-twitter");
+    twitterLink.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(activityUrl)}`;
+
+    const facebookLink = activityCard.querySelector(".share-facebook");
+    facebookLink.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(activityUrl)}&quote=${encodeURIComponent(shareText)}`;
+
+    const whatsappLink = activityCard.querySelector(".share-whatsapp");
+    whatsappLink.href = `https://wa.me/?text=${encodeURIComponent(shareText + " " + activityUrl)}`;
+
+    const copyButton = activityCard.querySelector(".share-copy");
+    copyButton.addEventListener("click", () => {
+      navigator.clipboard.writeText(activityUrl).then(() => {
+        copyButton.textContent = "✅";
+        setTimeout(() => {
+          copyButton.textContent = "📋";
+        }, 1500);
+      }).catch(() => {
+        copyButton.textContent = "❌";
+        setTimeout(() => {
+          copyButton.textContent = "📋";
+        }, 1500);
+      });
+    });
 
     activitiesList.appendChild(activityCard);
   }
@@ -852,6 +908,15 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       showMessage("Failed to sign up. Please try again.", "error");
       console.error("Error signing up:", error);
+    }
+  });
+
+  // Close share popups when clicking outside
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".share-section")) {
+      document.querySelectorAll(".share-popup").forEach((popup) => {
+        popup.classList.add("hidden");
+      });
     }
   });
 
