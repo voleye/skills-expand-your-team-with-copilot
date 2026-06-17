@@ -861,6 +861,30 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeRangeFilter,
   };
 
+  // Dark mode toggle
+  const darkModeToggle = document.getElementById("dark-mode-toggle");
+  const darkModeIcon = document.getElementById("dark-mode-icon");
+
+  function setDarkMode(enabled) {
+    if (enabled) {
+      document.body.classList.add("dark-mode");
+      darkModeIcon.textContent = "☀️";
+      localStorage.setItem("darkMode", "enabled");
+    } else {
+      document.body.classList.remove("dark-mode");
+      darkModeIcon.textContent = "🌙";
+      localStorage.setItem("darkMode", "disabled");
+    }
+  }
+
+  if (localStorage.getItem("darkMode") === "enabled") {
+    setDarkMode(true);
+  }
+
+  darkModeToggle.addEventListener("click", () => {
+    setDarkMode(!document.body.classList.contains("dark-mode"));
+  });
+
   // Initialize app
   checkAuthentication();
   initializeFilters();
