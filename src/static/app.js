@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
 
+  // School name used in share messages
+  const SCHOOL_NAME = "Mergington High School";
+
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
@@ -614,7 +617,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Build the share URL and message for this activity
     const activityUrl = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(name)}`;
-    const shareText = `Check out "${name}" at Mergington High School! Schedule: ${formattedSchedule}`;
+    const shareText = `Check out "${name}" at ${SCHOOL_NAME}! Schedule: ${formattedSchedule}`;
 
     const twitterLink = activityCard.querySelector(".share-twitter");
     twitterLink.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(activityUrl)}`;
@@ -629,6 +632,11 @@ document.addEventListener("DOMContentLoaded", () => {
     copyButton.addEventListener("click", () => {
       navigator.clipboard.writeText(activityUrl).then(() => {
         copyButton.textContent = "✅";
+        setTimeout(() => {
+          copyButton.textContent = "📋";
+        }, 1500);
+      }).catch(() => {
+        copyButton.textContent = "❌";
         setTimeout(() => {
           copyButton.textContent = "📋";
         }, 1500);
