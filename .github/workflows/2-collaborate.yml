@@ -61,7 +61,15 @@ jobs:
 
       - name: Disable current workflow and enable next one
         run: |
-          gh workflow disable "${{github.workflow}}"
-          gh workflow enable "Step 3"
+          CURRENT_WORKFLOW="2-collaborate.yml"
+          NEXT_WORKFLOW="3-prepare-environment.yml"
+
+          if [[ "$(gh api "repos/${{ github.repository }}/actions/workflows/${CURRENT_WORKFLOW}" --jq '.state')" == "active" ]]; then
+            gh workflow disable "$CURRENT_WORKFLOW"
+          fi
+
+          if [[ "$(gh api "repos/${{ github.repository }}/actions/workflows/${NEXT_WORKFLOW}" --jq '.state')" != "active" ]]; then
+            gh workflow enable "$NEXT_WORKFLOW"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
